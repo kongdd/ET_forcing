@@ -1,0 +1,48 @@
+```{r}
+#! /usr/bin/Rscript --no-init-file
+# Dongdong Kong ----------------------------------------------------------------
+# Copyright (c) 2022 Dongdong Kong. All rights reserved.
+source('scripts/main_pkgs.R')
+
+library(sf2)
+library(sf)
+library(rcolors)
+
+# df = fread("data-raw/dt_6forcing_annual_ET_2003-2018.csv")
+df = fread("data-raw/dt_6forcing_ET_trend_2003-2018.csv")
+st = df[, 1:3] |> unique()
+# df = df[, -(2:3)]
+shp = read_sf("data-raw/shp/All_Basins.shp")[, "DN"]
+shp2 = st_simplify(st_make_valid(shp), TRUE, dTolerance = 1000)
+
+# 一种插值方法
+# 1. 站点趋势
+
+## 1.1. 趋势一致性
+info = df[, cal_DCI_dt(.SD), .(site, lon, lat)]
+dat = melt(select(info, -ND), c("site", "lon", "lat"))
+```
+
+```{r}
+cols <- get_color(rcolors$amwg256, 20)
+
+# p = ggplot(dat[variable %in% c("NS", "NSO")], 
+#     aes(lon, lat, color = value)) + 
+#   geom_point(size = 1, alpha = 0.7) + 
+#   geom_sf(data = shp2, aes(x = NULL, y = NULL, color = NULL), fill = "transparent") + 
+#   scale_color_gradientn(colors = cols) +
+#   facet_wrap(~variable)
+p = ggplot(dat[variable %!in% c("NS", "NSO")], 
+    aes(lon, lat, color = value)) + 
+  geom_point(size = 1, alpha = 0.7) + 
+  # geom_sf(data = shp2, aes(x = NULL, y = NULL, color = NULL), fill = "transparent") + 
+  scale_color_gradientn(colors = cols[11:20]) +
+  facet_wrap(~variable)
+
+write_fig(p, 'Rplot.pdf', 10, 5)
+```
+
+
+## 1.2. 栅格化处理
+
+<!-- 5个再分析资料的趋势一致性 -->

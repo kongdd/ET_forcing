@@ -5,4 +5,9 @@
 
 suppressMessages({
   library(Ipaper)
+  library(tidymet)
+
+  library(data.table)
+  library(ggplot2)
+  library(gg.layers)
 })

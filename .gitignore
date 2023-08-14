@@ -4,3 +4,7 @@
 
 */temp
 */*/temp
+*.csv
+data-raw/shp
+*.pdf
+*.zip
